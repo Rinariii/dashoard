@@ -1,0 +1,202 @@
+
+<h2 class="sr-only">Dashboard Attrition Karyawan - menampilkan total karyawan, attrition rate, distribusi per departemen, job role, dan overtime</h2>
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); }
+  .dash { padding: 1.5rem 0; }
+  .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 8px; }
+  .header-left h1 { font-size: 18px; font-weight: 500; color: var(--color-text-primary); }
+  .header-left p { font-size: 13px; color: var(--color-text-secondary); margin-top: 2px; }
+  .badge { font-size: 11px; padding: 4px 10px; border-radius: 20px; background: #EAF3DE; color: #3B6D11; font-weight: 500; }
+  .scorecards { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 12px; margin-bottom: 1.5rem; }
+  .scorecard { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 1rem 1.25rem; }
+  .scorecard .label { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .scorecard .value { font-size: 26px; font-weight: 500; color: var(--color-text-primary); line-height: 1; }
+  .scorecard .sub { font-size: 12px; color: var(--color-text-secondary); margin-top: 4px; }
+  .scorecard.danger .value { color: #A32D2D; }
+  .scorecard.success .value { color: #3B6D11; }
+  .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .charts-row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .chart-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; }
+  .chart-card.full { grid-column: 1 / -1; }
+  .chart-title { font-size: 13px; font-weight: 500; color: var(--color-text-secondary); margin-bottom: 12px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 10px; font-size: 11px; color: var(--color-text-secondary); }
+  .legend-item { display: flex; align-items: center; gap: 4px; }
+  .legend-dot { width: 9px; height: 9px; border-radius: 2px; flex-shrink: 0; }
+  @media (max-width: 560px) {
+    .charts-row, .charts-row3 { grid-template-columns: 1fr; }
+    .chart-card.full { grid-column: 1; }
+  }
+</style>
+
+<div class="dash">
+  <div class="header">
+    <div class="header-left">
+      <h1>HR Attrition Dashboard</h1>
+      <p>IBM HR Analytics · 1.470 karyawan</p>
+    </div>
+    <span class="badge">2024</span>
+  </div>
+
+  <div class="scorecards">
+    <div class="scorecard">
+      <div class="label">Total karyawan</div>
+      <div class="value">1.470</div>
+      <div class="sub">seluruh departemen</div>
+    </div>
+    <div class="scorecard danger">
+      <div class="label">Attrition rate</div>
+      <div class="value">16,9%</div>
+      <div class="sub">179 dari 1.058 karyawan</div>
+    </div>
+    <div class="scorecard success">
+      <div class="label">Retensi</div>
+      <div class="value">83,1%</div>
+      <div class="sub">879 karyawan bertahan</div>
+    </div>
+    <div class="scorecard">
+      <div class="label">Overtime attrition</div>
+      <div class="value">31,9%</div>
+      <div class="sub">vs 10,8% non-overtime</div>
+    </div>
+  </div>
+
+  <div class="charts-row" style="margin-bottom:16px;">
+    <div class="chart-card">
+      <div class="chart-title">Distribusi attrition</div>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#E24B4A;"></span>Keluar (16,9%)</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#1D9E75;"></span>Bertahan (83,1%)</span>
+      </div>
+      <div style="position:relative;height:200px;"><canvas id="pie1" role="img" aria-label="Pie chart distribusi attrition: 16.9% keluar, 83.1% bertahan">179 keluar, 879 bertahan.</canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Overtime vs attrition</div>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#E24B4A;"></span>Attrition</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#1D9E75;"></span>Bertahan</span>
+      </div>
+      <div style="position:relative;height:200px;"><canvas id="bar3" role="img" aria-label="Grouped bar chart overtime vs attrition">Ya overtime: 98 keluar 209 bertahan. Tidak overtime: 81 keluar 670 bertahan.</canvas></div>
+    </div>
+  </div>
+
+  <div class="chart-card" style="margin-bottom:16px;">
+    <div class="chart-title">Attrition per departemen</div>
+    <div class="legend">
+      <span class="legend-item"><span class="legend-dot" style="background:#E24B4A;"></span>Keluar</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#1D9E75;"></span>Bertahan</span>
+    </div>
+    <div style="position:relative;height:160px;"><canvas id="bar1" role="img" aria-label="Stacked bar chart attrition per departemen">R&D: 107 keluar 594 bertahan. Sales: 66 keluar 253 bertahan. HR: 6 keluar 32 bertahan.</canvas></div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-title">Attrition rate per job role</div>
+    <div style="position:relative;height:360px;"><canvas id="bar2" role="img" aria-label="Horizontal bar chart attrition rate per job role">Sales Rep 43.1%, Lab Tech 26.1%, HR 20%, Research Sci 17.8%, Sales Exec 16.8%, Mfg Dir 6.5%, Healthcare Rep 9.1%, Manager 6.3%, Research Dir 3.2%</canvas></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const red = '#E24B4A';
+const green = '#1D9E75';
+const redBg = 'rgba(226,75,74,0.15)';
+const greenBg = 'rgba(29,158,117,0.15)';
+
+new Chart(document.getElementById('pie1'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Keluar','Bertahan'],
+    datasets: [{
+      data: [179, 879],
+      backgroundColor: [red, green],
+      borderWidth: 0,
+      hoverOffset: 6
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false, cutout: '60%',
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.raw} (${(ctx.raw/1058*100).toFixed(1)}%)` } }
+    }
+  }
+});
+
+new Chart(document.getElementById('bar1'), {
+  type: 'bar',
+  data: {
+    labels: ['Research & Development','Sales','Human Resources'],
+    datasets: [
+      { label: 'Keluar', data: [107,66,6], backgroundColor: red, borderRadius: 3 },
+      { label: 'Bertahan', data: [594,253,32], backgroundColor: green, borderRadius: 3 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { stacked: true, grid: { display: false }, ticks: { font: { size: 11 }, color: '#888' } },
+      y: { stacked: true, grid: { color: 'rgba(130,130,130,0.1)' }, ticks: { font: { size: 11 }, color: '#888' } }
+    }
+  }
+});
+
+const roles = ['Sales Rep','Lab Technician','Human Resources','Research Sci.','Sales Exec.','Healthcare Rep','Mfg Director','Manager','Research Dir.'];
+const rates = [43.1, 26.1, 20.0, 17.8, 16.8, 9.1, 6.5, 6.3, 3.2];
+const colors = rates.map(r => r >= 20 ? red : r >= 10 ? '#EF9F27' : green);
+
+new Chart(document.getElementById('bar2'), {
+  type: 'bar',
+  data: {
+    labels: roles,
+    datasets: [{
+      label: 'Attrition rate (%)',
+      data: rates,
+      backgroundColor: colors,
+      borderRadius: 4,
+      barPercentage: 0.65
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => ` ${ctx.raw}%` } }
+    },
+    scales: {
+      x: {
+        grid: { color: 'rgba(130,130,130,0.1)' },
+        ticks: { font: { size: 11 }, color: '#888', callback: v => v + '%' },
+        max: 50
+      },
+      y: {
+        grid: { display: false },
+        ticks: { font: { size: 11 }, color: '#888' }
+      }
+    }
+  }
+});
+
+new Chart(document.getElementById('bar3'), {
+  type: 'bar',
+  data: {
+    labels: ['Overtime: Ya','Overtime: Tidak'],
+    datasets: [
+      { label: 'Keluar', data: [98, 81], backgroundColor: red, borderRadius: 3 },
+      { label: 'Bertahan', data: [209, 670], backgroundColor: green, borderRadius: 3 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false },
+      tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.raw}` } }
+    },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { size: 11 }, color: '#888' } },
+      y: { grid: { color: 'rgba(130,130,130,0.1)' }, ticks: { font: { size: 11 }, color: '#888' } }
+    }
+  }
+});
+</script>
